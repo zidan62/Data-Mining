@@ -1,26 +1,36 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
-from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import LabelEncoder
+import pickle
 
-st.header("Lakukan Prediksi")
+st.title("Prediksi Kategori Body Type")
 
-height = st.slider("Masukkan Tinggi Badan (cm):", 100, 250, 170)
-weight = st.slider("Masukkan Berat Badan (kg):", 30, 150, 60)
+@st.cache_data
+def load_model():
+    with open("model_rf.pkl", "rb") as file:
+        model = pickle.load(file)
+    return model
+
+model = load_model()
+
+gender = st.selectbox("Pilih Gender", ["Male", "Female"])
+height = st.number_input("Masukkan Tinggi Badan (cm)", min_value=100, max_value=250, value=170)
+weight = st.number_input("Masukkan Berat Badan (kg)", min_value=30, max_value=200, value=70)
 
 if st.button("Prediksi"):
-    df = pd.read_csv("personality_dataset.csv")
-    le = LabelEncoder()
-    df['Body Type'] = le.fit_transform(df['Body Type'])
+    input_data = pd.DataFrame({
+        'Gender': [1 if gender == 'Male' else 0],
+        'Height': [height],
+        'Weight': [weight]
+    })
+    prediction = model.predict(input_data)[0]
 
-    X = df[['Height', 'Weight']]
-    y = df['Body Type']
+    label_map = {
+        0: 'Extremely Weak',
+        1: 'Weak',
+        2: 'Normal',
+        3: 'Overweight',
+        4: 'Obesity',
+        5: 'Extreme Obesity'
+    }
 
-    model = GaussianNB()
-    model.fit(X, y)
-
-    pred = model.predict(np.array([[height, weight]]))
-    result = le.inverse_transform(pred)[0]
-
-    st.success(f"Kategori Tubuh Anda: **{result}**")
+    st.success(f"Hasil Prediksi: {label_map[prediction]}")
