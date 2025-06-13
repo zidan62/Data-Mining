@@ -1,42 +1,34 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import classification_report
 
-st.title("Hasil Pelatihan Model")
+st.header("Hasil Pelatihan Model")
 
-# Load dataset
 df = pd.read_csv("personality_dataset.csv")
+le = LabelEncoder()
+df['Body Type'] = le.fit_transform(df['Body Type'])
 
-# Fitur dan target
-X = df[['Gender', 'Height', 'Weight']]
-y = df['Index']
+X = df[['Height', 'Weight']]
+y = df['Body Type']
 
-# Encode Gender
-X['Gender'] = X['Gender'].map({'Male': 1, 'Female': 0})
-
-# Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train model
-model = RandomForestClassifier(random_state=42)
-model.fit(X_train, y_train)
+# KNN
+knn = KNeighborsClassifier()
+knn.fit(X_train, y_train)
+y_pred_knn = knn.predict(X_test)
 
-# Prediksi dan evaluasi
-y_pred = model.predict(X_test)
+# Naive Bayes
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+y_pred_nb = nb.predict(X_test)
 
-st.subheader("Classification Report")
-st.text(classification_report(y_test, y_pred))
+st.subheader("KNN Classification Report")
+st.text(classification_report(y_test, y_pred_knn, target_names=le.classes_))
 
-st.subheader("Confusion Matrix")
-cm = confusion_matrix(y_test, y_pred)
-fig, ax = plt.subplots()
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
-ax.set_xlabel('Predicted')
-ax.set_ylabel('Actual')
-st.pyplot(fig)
-
-st.success("Model berhasil dilatih dan dievaluasi.")
+st.subheader("Naive Bayes Classification Report")
+st.text(classification_report(y_test, y_pred_nb, target_names=le.classes_))
