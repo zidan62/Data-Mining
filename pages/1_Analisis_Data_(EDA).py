@@ -3,23 +3,17 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Load dataset
-@st.cache_data
-def load_data():
-    return pd.read_csv("personality_dataset.csv")
+st.header("Analisis Data (EDA)")
 
-df = load_data()
+df = pd.read_csv("personality_dataset.csv")
+st.dataframe(df.head())
 
-# Judul halaman
-st.title("Distribusi Kategori Body Type")
-
-# Plot distribusi Body Type
+st.subheader("Distribusi Kategori Body Type")
 fig, ax = plt.subplots()
-sns.countplot(data=df, x='Body Type', ax=ax)
-plt.xticks(rotation=45)
-ax.set_title('Distribusi Kategori Body Type')
+sns.countplot(x='Body Type', data=df, ax=ax)
 st.pyplot(fig)
 
-# Info tambahan
-st.write("\nJumlah masing-masing kategori:")
-st.dataframe(df['Body Type'].value_counts())
+st.subheader("Korelasi antar Fitur")
+fig2, ax2 = plt.subplots()
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm', ax=ax2)
+st.pyplot(fig2)
