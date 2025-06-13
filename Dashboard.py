@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Prediksi Kepribadian", layout="wide")
 
-st.title("Selamat Datang di Dashboard Prediksi Kepribadian! 👋")
+st.title("Selamat Datang di Dashboard Prediksi Kategori Tubuh! 👋")
 
 st.markdown("---")
 
