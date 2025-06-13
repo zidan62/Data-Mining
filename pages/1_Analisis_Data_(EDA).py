@@ -1,19 +1,23 @@
 import streamlit as st
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
-st.header("Analisis Data (EDA)")
+st.title("Distribusi Kategori Body Type")
 
 df = pd.read_csv("personality_dataset.csv")
-st.dataframe(df.head())
 
-st.subheader("Distribusi Kategori Body Type")
-fig, ax = plt.subplots()
-sns.countplot(x='Body Type', data=df, ax=ax)
-st.pyplot(fig)
+df['Index'] = df['Index'].map({
+    0: 'Extremely Weak',
+    1: 'Weak',
+    2: 'Normal',
+    3: 'Overweight',
+    4: 'Obesity',
+    5: 'Extreme Obesity'
+})
 
-st.subheader("Korelasi antar Fitur")
-fig2, ax2 = plt.subplots()
-sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm', ax=ax2)
-st.pyplot(fig2)
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df, x='Index', palette='viridis')
+plt.xticks(rotation=45)
+plt.title("Distribusi Body Type")
+st.pyplot(plt)
